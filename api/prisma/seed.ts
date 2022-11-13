@@ -7,6 +7,7 @@ async function main() {
     data: {
       name: "Cleginaldo Bandeiras",
       email: "cleginaldo3000@gmail.com",
+      googleId: "101243502068554854010",
       avatarUrl: "https://github.com/cleginaldo_dev.png",
     },
   });
