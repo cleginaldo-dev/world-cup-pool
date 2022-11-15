@@ -1,4 +1,6 @@
 import { getName } from "country-list";
+import { format } from "date-fns";
+import ptBr from "date-fns/locale/pt-BR";
 import { Button, HStack, Text, useTheme, VStack } from "native-base";
 import { X, Check } from "phosphor-react-native";
 
@@ -18,6 +20,7 @@ export interface GameProps {
   firstTeamCountryCode: string;
   secondTeamCountryCode: string;
   guess: null | GuessProps;
+  date: string;
 }
 
 interface Props {
@@ -35,6 +38,12 @@ export function Game({
 }: Props) {
   const { colors, sizes } = useTheme();
 
+  const date = format(
+    new Date(data.date),
+    "dd 'de' MMMM 'de' yyyy 'às' HH:mm'h'",
+    { locale: ptBr }
+  );
+
   return (
     <VStack
       w="full"
@@ -51,9 +60,11 @@ export function Game({
         {getName(data.secondTeamCountryCode)}
       </Text>
 
-      <Text color="gray.200" fontSize="xs">
-        22 de Novembro de 2022 às 16:00h
-      </Text>
+      {date && (
+        <Text color="gray.200" fontSize="xs">
+          {date}
+        </Text>
+      )}
 
       <HStack
         mt={4}
@@ -80,8 +91,8 @@ export function Game({
         <Button
           size="xs"
           w="full"
-          bgColor="green.500"
           mt={4}
+          colorScheme="green"
           onPress={onGuessConfirm}
         >
           <HStack alignItems="center">

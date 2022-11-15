@@ -1,5 +1,4 @@
 /* eslint-disable consistent-return */
-import { AxiosError } from "axios";
 import { Heading, Text, useToast, VStack } from "native-base";
 import { useState } from "react";
 
@@ -35,9 +34,10 @@ export function New() {
 
       setTitle("");
     } catch (error) {
-      const err = error as AxiosError;
       toast.show({
-        title: `Erro ao criar o bolão: ${JSON.stringify(err.response.data)}`,
+        title: `Erro ao criar o bolão: ${JSON.stringify(
+          error.response?.data?.message
+        )}`,
         bgColor: "red.500",
         placement: "top",
       });

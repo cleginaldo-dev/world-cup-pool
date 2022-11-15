@@ -52,7 +52,7 @@ export async function pooRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post(
-    "/polls/join",
+    "/pools/join",
     { onRequest: [authenticate] },
     async (request, reply) => {
       const joinPoolBody = z.object({
@@ -115,6 +115,11 @@ export async function pooRoutes(fastify: FastifyInstance) {
           },
         },
       },
+
+      orderBy: {
+        createdAt: "desc",
+      },
+
       include: {
         _count: {
           select: {
