@@ -3,6 +3,8 @@ import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
+import { api } from "../services/api";
+
 WebBrowser.maybeCompleteAuthSession();
 
 interface IUserProps {
@@ -13,14 +15,13 @@ interface IUserProps {
 export interface IAuthContextDataProps {
   user: IUserProps;
   signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
+  // signOut: () => Promise<void>;
   isLoading: boolean;
 }
 
 interface IAuthContextProps {
   children: ReactNode;
 }
-
 const { CLIENT_ID } = process.env;
 
 export const AuthContext = createContext({} as IAuthContextDataProps);
@@ -29,9 +30,9 @@ export function AuthContextProvider({ children }: IAuthContextProps) {
   const [user, setUser] = useState({} as IUserProps);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("CLIENT_ID", CLIENT_ID);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId:
-      "842707663015-nveacurcn775b0f0m1j71dq61iqan654.apps.googleusercontent.com",
+    clientId: CLIENT_ID,
     redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
     scopes: ["profile", "email"],
   });
@@ -47,11 +48,29 @@ export function AuthContextProvider({ children }: IAuthContextProps) {
       setIsLoading(false);
     }
   };
-  const signOut = async () => {
-    console.log("deslogar");
-  };
+
+  // const signOut = async () => {
+  //   console.log("logout");
+  // };
+
   const signInWithGoogle = async (access_token: string) => {
-    console.log("TOKEN:", access_token);
+    try {
+      setIsLoading(true);
+      const { data: tokenResponse } = await api.post("/users", {
+        access_token,
+      });
+
+      api.defaults.headers.common.Authorization = `Bearer ${tokenResponse.token}`;
+
+      const { data: userInfosResponse } = await api.get("/me");
+
+      setUser(userInfosResponse.user);
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -66,7 +85,7 @@ export function AuthContextProvider({ children }: IAuthContextProps) {
         user,
         isLoading,
         signIn,
-        signOut,
+        // signOut,
       }}
     >
       {children}
